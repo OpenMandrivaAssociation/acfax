@@ -11,6 +11,7 @@ Patch0:        	acfax.dif
 Patch1:       	widgets.c_missing_sentinel.diff
 Patch2:       	acfax_mod_demod_c__fix-includes.diff
 Patch3:       	acfax_DirMgr_RE_SYNTAX_EGREP.patch  
+BuildRequires:	gccmakedep
 BuildRequires:	imake
 BuildRequires:	Xaw3d-devel
 
