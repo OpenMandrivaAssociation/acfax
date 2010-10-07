@@ -12,7 +12,7 @@ Patch1:       	widgets.c_missing_sentinel.diff
 Patch2:       	acfax_mod_demod_c__fix-includes.diff
 Patch3:       	acfax_DirMgr_RE_SYNTAX_EGREP.patch  
 BuildRequires:	imake
-BuildRequires:	libXaw3d-devel
+BuildRequires:	Xaw3d-devel
 
 %description
 Software to receive ham radio faxes with the soundcard.
