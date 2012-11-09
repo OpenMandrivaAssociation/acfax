@@ -1,0 +1,14 @@
+diff -ur acfax-981011/DirMgr.c acfax-981011.new/DirMgr.c
+--- acfax-981011/DirMgr.c	1995-06-24 16:33:27.000000000 +0000
++++ acfax-981011.new/DirMgr.c	2009-03-08 17:09:01.000000000 +0000
+@@ -21,6 +21,10 @@
+  * 	
+  */ 
+ 
++#define _GNU_SOURCE
++#include <stdlib.h>
++#include <regex.h>
++
+ #include "DirMgr.h"
+ 
+ #ifndef NO_REGEXP

@@ -1,0 +1,12 @@
+diff -Naur acfax.orig//mod_demod.c acfax/mod_demod.c
+--- acfax.orig//mod_demod.c	1998-07-08 18:32:02.000000000 +0200
++++ acfax/mod_demod.c	2008-10-19 13:29:48.617147152 +0200
+@@ -28,6 +28,8 @@
+ #include <math.h>
+ #include <unistd.h>
+ #include "mod_demod.h"
++//fix includes
++#include <string.h>
+ 
+ SHORT int firwide[] = {  6,   20,   7, -42, -74, -12, 159, 353, 440 };
+ SHORT int firmiddle[] = {   0, -18, -38, -39,   0,  83, 191, 284, 320 };

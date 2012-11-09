@@ -1,0 +1,239 @@
+--- DirMgr.c
++++ DirMgr.c
+@@ -151,7 +151,7 @@
+ } /* End DirectoryMgrClose */
+ 
+ 
+-int DirectoryMgrRefilter(dm,f_func,f_data,f_free)
++void DirectoryMgrRefilter(dm,f_func,f_data,f_free)
+ DirectoryMgr *dm;
+ PFI f_func;
+ char *f_data;
+--- DirMgr.h
++++ DirMgr.h
+@@ -137,7 +137,7 @@
+ int		DirectoryMgrCanOpen();
+ DirectoryMgr *	DirectoryMgrOpen();
+ void		DirectoryMgrClose();
+-int		DirectoryMgrRefilter();
++void		DirectoryMgrRefilter();
+ int		DirectoryMgrRefresh();
+ void		DirectoryMgrResort();
+ 
+@@ -172,7 +172,7 @@
+ DirectoryMgr *	DirectoryMgrOpen(char *path, PFI c_func, PFI f_func,
+ 			char *f_data, int free_data);
+ void		DirectoryMgrClose(DirectoryMgr *dm);
+-int		DirectoryMgrRefilter(DirectoryMgr *dm, PFI f_func,
++void		DirectoryMgrRefilter(DirectoryMgr *dm, PFI f_func,
+ 			char *f_data, int f_free);
+ int		DirectoryMgrRefresh(DirectoryMgr *dm);
+ void		DirectoryMgrResort(DirectoryMgr *dm, PFI c_func);
+--- Imakefile
++++ Imakefile
+@@ -47,7 +47,7 @@
+ 
+ all:: acfax
+ 
+-ComplexProgramTarget(acfax)
++ComplexProgramTargetNoMan(acfax)
+ 
+ acfax.o:	global.h mod_demod.h sblaster.h widgets.h
+ widgets.o:	widgets.h
+--- fax_funcs.c
++++ fax_funcs.c
+@@ -39,7 +39,7 @@
+ 
+ /* some variables that are allowed to be global */
+ int	lpm;		/* lines per minute */
+-int     ixoc;           /* number of pixels of one scan-line / PI */
++int     ixoc;           /* number of pixels of one scan-line / M_PI */
+ int	devi;		/* deviation in Hz (+/- of middle) */
+ int     mod_mode;       /* can be MOD_FM or MOD_AM */
+ int     aptstart;       /* possible APT start values */
+@@ -160,7 +160,7 @@
+ /*
+  * setup_fax sets up all the variables for FAX-reception and transmission.
+  * s_lpm : lines per minute (no change if set to 0)
+- * s_ixoc: IOC to use (pixels per line = PI * IOC) (no change if set to 0)
++ * s_ixoc: IOC to use (pixels per line = M_PI * IOC) (no change if set to 0)
+  * mode  : fax-specific mode setings such as writing direction and order,
+  *	   phase-in polarity and grayscale or color-mode
+  * s_devi: deviation to use for FM (no change if set to 0)
+@@ -312,7 +312,7 @@
+     }
+     /* recomputations are done in disp_func() */
+     fprintf(stderr, "initializing disp_func\n");
+-    disp_func(D_CPINIT | D_WDINIT | D_LDINIT);
++    disp_func(D_CM_PINIT | D_WDINIT | D_LDINIT);
+     /* now call function to re-create picture */
+ #if stillneeded	/* the disp_func should lock itself */
+     old_func = disp_func;
+@@ -440,7 +440,7 @@
+  * grayscale FAX decoding main routine.
+  * init is used to control the behavior and initialize some internal
+  * variables. It is bit-wise coded as follows :
+- *  D_CPINIT : initialize read-pointer to start of core-buffer
++ *  D_CM_PINIT : initialize read-pointer to start of core-buffer
+  *  D_WDINIT : initialize x-position to the start-value
+  *  D_LDINIT : initialize y-position to the start-value
+  *  D_ALLOWX : periodically call XtAppProcessEvent during processing
+@@ -475,12 +475,12 @@
+     smpl_line = 60.0 / lpm * smplf;
+     if (vertical) {
+       inc_pix = smpl_line / canhei;
+-      inc_line = (int)(ixoc * PI * 65536.0 / canhei); 
++      inc_line = (int)(ixoc * M_PI * 65536.0 / canhei); 
+       imgmax = DEFWIDTH;
+       put_pix = verimag->f.put_pixel;
+     } else {
+       inc_pix = smpl_line / canwid;
+-      inc_line = (int)(ixoc * PI * 65536.0 / canwid); 
++      inc_line = (int)(ixoc * M_PI * 65536.0 / canwid); 
+       imgmax = DEFHEIGHT;
+       put_pix = horimag->f.put_pixel;
+     }
+@@ -547,7 +547,7 @@
+     }
+ #endif
+ 
+-    if (init & D_CPINIT) {
++    if (init & D_CM_PINIT) {
+       /* initialize the fractional index pointers */
+       idx_pix = idx_line = idx_p0 = 0;
+       core_pix = core_line = core_start;
+@@ -712,7 +712,7 @@
+  * F_DOSAVE : save image if file is opened, close when completed
+  * F_OPEN : open file, faxsavename contains the name and width the width
+  *	    of the image. If width is not given, the best resolution is taken
+- *	    (width = PI * IOC)
++ *	    (width = M_PI * IOC)
+  * F_CLOSE : close file and adjust data in header to actual values
+  * F_GETDIM : get dimensions and parameters of image into internal variables
+  * the filename must previously be put into faxsavename.
+@@ -753,7 +753,7 @@
+      if (width > 0)
+       swidth = width;
+     else
+-      swidth = (ixoc * PI) + 0.5;
++      swidth = (ixoc * M_PI) + 0.5;
+     fsfile = fopen(faxsavename, "wb");
+     if (!(fsfile)) {
+       return SAVE_NPERM;
+@@ -787,7 +787,7 @@
+     /* now initialize all the variables... */
+     fprintf(stderr, "getting image settings...");
+     inc_pix = smpl_line / swidth;
+-    inc_line = (int)(ixoc * PI * 65536.0 / swidth); 
++    inc_line = (int)(ixoc * M_PI * 65536.0 / swidth); 
+     idx_pix = idx_line = idx_p0 = 0;
+     core_pix = core_line = core_start;
+     save_wptr = core_wptr;
+@@ -1157,7 +1157,7 @@
+   fprintf(stderr,"starting fax reception\n");
+   /* if we come from phasing, initialize disp_func */
+   if (fax_state == FAX_PHAS)
+-    disp_func(D_CPINIT | D_WDINIT | D_LDINIT);
++    disp_func(D_CM_PINIT | D_WDINIT | D_LDINIT);
+   fax_state = FAX_RX;
+   if (internal)
+     mode_notify(fax_state);
+@@ -1214,7 +1214,7 @@
+   tmp_pos = (smpl_line >> 16);
+   if (core_start - core_dta > tmp_pos)
+     core_start -= tmp_pos;
+-  old_func (D_CPINIT | D_WDINIT | D_LDINIT);
++  old_func (D_CM_PINIT | D_WDINIT | D_LDINIT);
+   old_func (D_ALLOWX);
+   disp_func = old_func;
+ }
+@@ -1235,9 +1235,9 @@
+   if (right2left) flip ^= 1;
+   if (bot2top) flip ^= 1;
+   if (vertical) {
+-    df = (smplf * (double)dy) / (dx * PI * ixoc);
++    df = (smplf * (double)dy) / (dx * M_PI * ixoc);
+   } else {
+-    df = (smplf * (double)dx) / (dy * PI * ixoc);
++    df = (smplf * (double)dx) / (dy * M_PI * ixoc);
+   }
+   if (flip) df = -df;
+   smplf += df;
+@@ -1247,7 +1247,7 @@
+ 
+   old_func = disp_func;
+   disp_func = NULL;
+-  old_func (D_CPINIT | D_WDINIT | D_LDINIT);
++  old_func (D_CM_PINIT | D_WDINIT | D_LDINIT);
+   old_func (D_ALLOWX);
+   disp_func = old_func;
+ }
+@@ -1446,14 +1446,14 @@
+     smpl_line = 60.0 / lpm * smplf;
+     if (vertical) {
+       inc_pix = smpl_line / theight;
+-      inc_line = (int)(ixoc * PI * 65536.0 / theight); 
++      inc_line = (int)(ixoc * M_PI * 65536.0 / theight); 
+       imgmax = DEFWIDTH;
+       put_pix = verimag->f.put_pixel;
+       bytes_per_pixel = twidth;
+       bytes_per_line = 1;
+     } else {
+       inc_pix = smpl_line / twidth;
+-      inc_line = (int)(ixoc * PI * 65536.0 / twidth); 
++      inc_line = (int)(ixoc * M_PI * 65536.0 / twidth); 
+       imgmax = DEFHEIGHT;
+       put_pix = horimag->f.put_pixel;
+       bytes_per_pixel = 1;
+@@ -1500,10 +1500,10 @@
+     /* twidth, theight, timg_ptr */
+     if (vertical) {
+       inc_pix = 65536.0 * theight * lpm / ((60.0/65536.0) * smplf);
+-      inc_line = 65536.0 * theight / (PI * ixoc);
++      inc_line = 65536.0 * theight / (M_PI * ixoc);
+     } else {
+       inc_pix = 65536.0 * twidth * lpm / ((60.0/65536.0) * smplf);
+-      inc_line = 65536.0 * twidth / (PI * ixoc);
++      inc_line = 65536.0 * twidth / (M_PI * ixoc);
+     }
+       if (right2left) {
+ 	pixinc = -1;
+--- fax_funcs.h
++++ fax_funcs.h
+@@ -43,7 +43,7 @@
+ #define DBG_SYN 4
+ 
+ /* decoding function: initialisation types (see fax_funcs.c) */
+-#define D_CPINIT	0x00000001
++#define D_CM_PINIT	0x00000001
+ #define D_WDINIT	0x00000002
+ #define D_LDINIT	0x00000004
+ #define D_INITS		0x00000007
+--- mod_demod.c
++++ mod_demod.c
+@@ -99,7 +99,7 @@
+   }
+   fmphsinc = (int *)malloc(258*sizeof(int));
+   for (i=0; i<1024; i++)
+-    sintab[i] = 127.5 + 127*sin(i*PI/512.0); 
++    sintab[i] = 127.5 + 127*sin(i*M_PI/512.0); 
+ 
+   inited = -1;
+ }
+@@ -120,14 +120,14 @@
+   if (devi > 1200) devi = 1200;
+   if (maxval < 1) maxval = 1;
+   if (maxval > 255) maxval = 255;
+-  phmax = 255.9 * sin(devi * PI / 4000.0) + 0.5;
++  phmax = 255.9 * sin(devi * M_PI / 4000.0) + 0.5;
+   for (i=0; i<512; i++) {
+     if (i <= 256-phmax)
+       asntab[i] = 0;
+     else if (i >= 256+phmax)
+       asntab[i] = maxval;
+     else
+-      asntab[i] = maxval * 2000 / devi * asin((i-256.0)/256.5) / PI
++      asntab[i] = maxval * 2000 / devi * asin((i-256.0)/256.5) / M_PI
+ 		+ maxval/ 2;
+   }
+   for (i=0; i<2048; i++) {

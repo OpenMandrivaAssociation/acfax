@@ -1,0 +1,12 @@
+diff -Naur acfax.orig//widgets.c acfax/widgets.c
+--- acfax.orig//widgets.c	1998-10-11 18:54:56.000000000 +0200
++++ acfax/widgets.c	2008-10-02 07:22:33.968789679 +0200
+@@ -875,7 +875,7 @@
+ {
+   XtVaSetValues(info_s.shell, XtNtitle, "Info", NULL);
+   XtVaSetValues(info_s.text, XtNstring, str, NULL);
+-  XtVaSetValues(info_s.butn, XtNlabel, "-OK-");
++  XtVaSetValues(info_s.butn, XtNlabel, "-OK-", NULL);
+   XtAddCallback(info_s.butn, XtNcallback, end_simple_info, (XtPointer)NULL);
+   XtPopup(info_s.shell, XtGrabNone);
+ }
