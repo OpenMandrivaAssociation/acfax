@@ -45,3 +45,23 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc 0* ChangeLog
 %{_bindir}/acfax
+
+
+%changelog
+* Tue Dec 21 2010 Funda Wang <fwang@mandriva.org> 981011-3mdv2011.0
++ Revision: 623671
+- rebuild for new Xaw3d7
+
+* Thu Oct 07 2010 Jani Välimaa <wally@mandriva.org> 981011-2mdv2011.0
++ Revision: 583932
+- fix BR
+- fix source
+- clean spec
+- use compiler flags
+
+  + Thomas Spuhler <tspuhler@mandriva.org>
+    - added buildrequires; libXaw3d-devel
+    - Initial upload
+    - Initial upload
+    - Created package structure for acfax.
+
