@@ -1,7 +1,7 @@
 Name:         	acfax
 Version:      	981011
 Summary:      	Amateur Radio FAX Receiving Software for Linux / X11 
-Release:      	%mkrel 3
+Release:      	4
 License:        GPLv2+
 Group:          Networking/Other
 URL:            http://linux.maruhn.com/sec/acfax.html
