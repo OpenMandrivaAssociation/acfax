@@ -4,7 +4,7 @@ Summary:      	Amateur Radio FAX Receiving Software for Linux / X11
 Release:      	4
 License:        GPLv2+
 Group:          Networking/Other
-URL:            http://linux.maruhn.com/sec/acfax.html
+URL:            https://linux.maruhn.com/sec/acfax.html
 Group:        	Networking/Other 
 Source:       	ftp://ftp.funet.fi/pub/ham/unix/Linux/misc/%{name}-%{version}.tar.gz
 Patch0:        	acfax.dif
